@@ -7,9 +7,9 @@
 #include "windows.h"
 #endif
 #include <algorithm>
-#include "pthread.h"
-#include "sched.h"
-#include "semaphore.h"
+//#include "pthread.h"
+//#include "sched.h"
+//#include "semaphore.h"
 #include "CbcEventHandler.hpp"
 #include "CoinPragma.hpp"
 #include "CoinPragma.hpp"
@@ -60,7 +60,7 @@
 #include "CbcHeuristicRandRound.hpp"
 #include "CbcHeuristicRENS.hpp"
 #include "CbcHeuristicVND.hpp"
-#include "CglGMI.hpp"
+//#include "CglGMI.hpp"
 #include "CglRedSplit2.hpp"
 #include "CglResidualCapacity.hpp"
 #include "CglZeroHalf.hpp"

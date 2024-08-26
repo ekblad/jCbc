@@ -1,0 +1,164 @@
+cmake_minimum_required(VERSION 3.12)
+project(jCbc)
+
+# Set variables
+set(Java_Path "C:/Program Files/Java/jdk1.8.0_202")
+set(COIN_OR_ROOT "C:/Users/nsandhu/dev/coinbrew")
+set(CBC_Path "${COIN_OR_ROOT}/Cbc/Cbc")
+set(CBC_Lib "${CBC_Path}/MSVisualStudio/v17/x64/Release")
+set(JCBC_PKG src)
+# Find SWIG
+find_package(SWIG REQUIRED)
+include(${SWIG_USE_FILE})
+
+# Find Java
+find_package(Java REQUIRED)
+include(UseJava)
+find_package(JNI REQUIRED)
+
+# SWIG settings
+set(CMAKE_SWIG_FLAGS -c++ -package JCBC_PKG)
+set_property(SOURCE jCbc.i PROPERTY CPLUSPLUS ON)
+set_property(SOURCE jCbc.i PROPERTY SWIG_MODULE_NAME jCbc)
+
+# Generate SWIG wrapper
+set(SWIG_OUTFILE_DIR ${CMAKE_CURRENT_BINARY_DIR}/src)
+file(MAKE_DIRECTORY ${SWIG_OUTFILE_DIR})
+set(CMAKE_SWIG_FLAGS -c++ -package src -outdir ${SWIG_OUTFILE_DIR})
+swig_add_library(jCbc
+    TYPE SHARED
+    LANGUAGE java
+    SOURCES jCbc.i jCbc.cpp
+    OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/src
+    OUTFILE_DIR ${CMAKE_CURRENT_BINARY_DIR}
+)
+# Include directories
+target_include_directories(jCbc PRIVATE
+    ${Java_Path}/include
+    ${Java_Path}/include/win32
+    ${COIN_OR_ROOT}/../src
+    ${COIN_OR_ROOT}/Cbc/Cbc/src
+    ${COIN_OR_ROOT}/Cbc/Cbc/src/OsiCbc
+    ${COIN_OR_ROOT}/Cgl/Cgl/src
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglClique
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglDuplicateRow
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglOddHole
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglFlowCover
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglGMI
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglGomory
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglKnapsackCover
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglLandP
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglMixedIntegerRounding
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglMixedIntegerRounding2
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglPreProcess
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglProbing
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglRedSplit
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglRedSplit2
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglResidualCapacity
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglSimpleRounding
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglTwomir
+    ${COIN_OR_ROOT}/Cgl/Cgl/src/CglZeroHalf
+    ${COIN_OR_ROOT}/Clp/Clp/src
+    ${COIN_OR_ROOT}/Clp/Clp/src/OsiClp
+    ${COIN_OR_ROOT}/Osi/Osi/src/Osi
+    ${COIN_OR_ROOT}/CoinUtils/CoinUtils/src
+    ${COIN_OR_ROOT}/pthreads
+)
+# Compiler flags
+target_compile_options(jCbc PRIVATE)
+
+# Linker flags
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
+
+# Link libraries
+# Find all required libraries
+find_library(CBC_SOLVER_LIB NAMES CbcSolver libCbcSolver PATHS ${CBC_Lib})
+find_library(CBC_LIB NAMES Cbc libCbc PATHS ${CBC_Lib})
+find_library(CLP_LIB NAMES Clp libClp PATHS ${CBC_Lib})
+find_library(OSI_CLP_LIB NAMES OsiClp libOsiClp PATHS ${CBC_Lib})
+find_library(OSI_LIB NAMES Osi libOsi PATHS ${CBC_Lib})
+find_library(OSI_CBC_LIB NAMES OsiCbc libOsiCbc PATHS ${CBC_Lib})
+find_library(CGL_LIB NAMES Cgl libCgl PATHS ${CBC_Lib})
+find_library(COINUTILS_LIB NAMES CoinUtils libCoinUtils PATHS ${CBC_Lib})
+#find_library(COINMUMPS_LIB NAMES coinmumps libcoinmumps PATHS ${CBC_Lib})
+#find_library(COINBLAS_LIB NAMES coinblas libcoinblas PATHS ${CBC_Lib})
+#find_library(COINLAPACK_LIB NAMES coinlapack libcoinlapack PATHS ${CBC_Lib})
+#find_library(COINASL_LIB NAMES coinasl libcoinasl PATHS ${CBC_Lib})
+#find_library(COINMETIS_LIB NAMES coinmetis libcoinmetis PATHS ${CBC_Lib})
+#find_library(COINGLPK_LIB NAMES coinglpk libcoinglpk PATHS ${CBC_Lib})
+
+# Find additional system libraries
+find_library(GFORTRAN_LIB gfortran)
+find_library(Z_LIB z)
+find_library(QUADMATH_LIB quadmath)
+
+# Check if all libraries were found
+set(REQUIRED_LIBS 
+    CBC_SOLVER_LIB CBC_LIB CLP_LIB OSI_CLP_LIB OSI_LIB OSI_CBC_LIB CGL_LIB 
+    COINUTILS_LIB 
+    # COINMUMPS_LIB COINBLAS_LIB COINLAPACK_LIB COINASL_LIB COINMETIS_LIB COINGLPK_LIB 
+    # GFORTRAN_LIB Z_LIB QUADMATH_LIB
+)
+
+foreach(LIB ${REQUIRED_LIBS})
+    if(NOT ${LIB})
+        message(FATAL_ERROR "${LIB} not found")
+    endif()
+endforeach()
+
+# Link libraries
+target_link_libraries(jCbc PRIVATE
+    ${CBC_SOLVER_LIB}
+    ${CBC_LIB}
+    ${CLP_LIB}
+    ${OSI_CLP_LIB}
+    ${OSI_LIB}
+    ${OSI_CBC_LIB}
+    ${CGL_LIB}
+    ${COINUTILS_LIB}
+    #${COINMUMPS_LIB}
+    #${COINBLAS_LIB}
+    #${COINLAPACK_LIB}
+    #${COINASL_LIB}
+    #${COINMETIS_LIB}
+    #${COINGLPK_LIB}
+    #${GFORTRAN_LIB}
+    #${Z_LIB}
+    #${QUADMATH_LIB}
+)
+# Set output name
+set_target_properties(jCbc PROPERTIES OUTPUT_NAME jCbc)
+
+# java jar file 
+# Set the directory where SWIG generated the Java files
+set(SWIG_JAVA_DIR ${CMAKE_CURRENT_BINARY_DIR}/src)
+
+# Find all generated Java files
+file(GLOB GENERATED_JAVA_FILES "${SWIG_JAVA_DIR}/*.java")
+
+# Set the output directory for compiled class files
+set(CLASS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/classes)
+
+# Create the output directory
+file(MAKE_DIRECTORY ${CLASS_OUTPUT_DIR})
+
+# Compile Java files
+add_custom_command(
+    OUTPUT ${CLASS_OUTPUT_DIR}/compiled_marker
+    COMMAND ${Java_JAVAC_EXECUTABLE} -d ${CLASS_OUTPUT_DIR} ${GENERATED_JAVA_FILES}
+    COMMAND ${CMAKE_COMMAND} -E touch ${CLASS_OUTPUT_DIR}/compiled_marker
+    DEPENDS jCbc ${GENERATED_JAVA_FILES}
+    COMMENT "Compiling Java files"
+)
+
+# Create JAR file
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/jCbc.jar
+    COMMAND ${Java_JAR_EXECUTABLE} cf jCbc.jar -C ${CLASS_OUTPUT_DIR} .
+    DEPENDS ${CLASS_OUTPUT_DIR}/compiled_marker
+    COMMENT "Creating JAR file"
+)
+
+# Add a custom target to ensure the JAR is built
+add_custom_target(jCbc_jar ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/jCbc.jar)
+add_dependencies(jCbc_jar jCbc)

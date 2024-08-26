@@ -1,4 +1,4 @@
-2import src.jCbc;
+import src.jCbc;
 import src.SWIGTYPE_p_CbcModel;
 import src.SWIGTYPE_p_CoinModel;
 import src.SWIGTYPE_p_OsiClpSolverInterface;
