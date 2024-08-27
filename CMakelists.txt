@@ -145,7 +145,7 @@ file(MAKE_DIRECTORY ${CLASS_OUTPUT_DIR})
 # Compile Java files
 add_custom_command(
     OUTPUT ${CLASS_OUTPUT_DIR}/compiled_marker
-    COMMAND ${Java_JAVAC_EXECUTABLE} -d ${CLASS_OUTPUT_DIR} ${GENERATED_JAVA_FILES}
+    COMMAND ${Java_JAVAC_EXECUTABLE} -d ${CLASS_OUTPUT_DIR} ${SWIG_JAVA_DIR}/*.java
     COMMAND ${CMAKE_COMMAND} -E touch ${CLASS_OUTPUT_DIR}/compiled_marker
     DEPENDS jCbc ${GENERATED_JAVA_FILES}
     COMMENT "Compiling Java files"
