@@ -1,15 +1,15 @@
 [submodule "build/Cbc"]
 	path = build/Cbc
-	url = https://github.com/CentralValleyModeling/Cbc.git
+	url = https://github.com/ekblad/Cbc.git
 [submodule "build/Osi"]
 	path = build/Osi
-	url = https://github.com/CentralValleyModeling/Osi.git
+	url = https://github.com/ekblad/Osi.git
 [submodule "build/Clp"]
 	path = build/Clp
-	url = https://github.com/coin-or/Clp.git
+	url = https://github.com/ekblad/Clp.git
 [submodule "build/CoinUtils"]
 	path = build/CoinUtils
-	url = https://github.com/coin-or/CoinUtils.git
+	url = https://github.com/ekblad/CoinUtils.git
 [submodule "build/Cgl"]
 	path = build/Cgl
-	url = https://github.com/coin-or/Cgl.git
+	url = https://github.com/ekblad/Cgl.git
